@@ -11,13 +11,11 @@ import (
 
 type GetCityByCepRepositoryImpl struct {
 	client httpclient.HTTPClient
-	apiKey string
 }
 
-func NewGetCityByCepRepositoryImpl(client httpclient.HTTPClient, apiKey string) *GetCityByCepRepositoryImpl {
+func NewGetCityByCepRepositoryImpl(client httpclient.HTTPClient) *GetCityByCepRepositoryImpl {
 	return &GetCityByCepRepositoryImpl{
 		client: client,
-		apiKey: apiKey,
 	}
 }
 

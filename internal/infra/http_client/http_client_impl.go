@@ -36,7 +36,7 @@ func (c *HTTPClientImpl) Get(ctx context.Context, url string) ([]byte, error) {
 		return nil, errors.New("erro ao fazer o GET: status " + resp.Status)
 	}
 
-	body, err := io.ReadAll(req.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}

@@ -8,7 +8,6 @@ import (
 
 type Config struct {
 	WebServerPort string
-	CEPKey        string
 	WeatherKey    string
 }
 
@@ -19,7 +18,6 @@ func LoadConfig() (*Config, error) {
 
 	return &Config{
 		WebServerPort: getEnv("WEB_SERVER_PORT"),
-		CEPKey:        getEnv("CEP_API_KEY"),
 		WeatherKey:    getEnv("WEATHER_API_KEY"),
 	}, nil
 }
