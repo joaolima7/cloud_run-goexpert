@@ -1,7 +1,5 @@
 package cep
 
-import "errors"
-
 type Cep struct {
 	CEP string
 }
@@ -21,11 +19,11 @@ func NewCep(cep string) (*Cep, error) {
 
 func (c *Cep) ValidateCep() error {
 	if c.CEP == "" {
-		return errors.New("CEP não pode ser vazio")
+		return ErrInvalidCep
 	}
 
 	if len(c.CEP) != 8 {
-		return errors.New("CEP deve conter 8 dígitos")
+		return ErrInvalidCep
 	}
 
 	return nil

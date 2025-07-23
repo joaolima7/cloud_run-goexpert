@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/joaolima7/cloud_run-goexpert/internal/domain/cep"
 	"github.com/joaolima7/cloud_run-goexpert/internal/domain/cep/usecase"
 	weatherUC "github.com/joaolima7/cloud_run-goexpert/internal/domain/weather/usecase"
 )
@@ -31,8 +32,16 @@ func (h *AppHandler) getWeatherByCity(w http.ResponseWriter, r *http.Request) {
 	cepParam := chi.URLParam(r, "cep")
 	out, err := h.useCaseCep.Execute(usecase.CepInputDTO{Cep: cepParam})
 	if err != nil {
-		h.respondError(w, http.StatusBadRequest, err)
-		return
+		if err == cep.ErrInvalidCep {
+			h.respondError(w, http.StatusUnprocessableEntity, err)
+			return
+		} else if err == cep.ErrCepNotFound {
+			h.respondError(w, http.StatusNotFound, err)
+			return
+		} else {
+			h.respondError(w, http.StatusInternalServerError, err)
+			return
+		}
 	}
 
 	outWeather, err := h.useCaseWeather.Execute(weatherUC.WeatherInputDTO{City: out.City})

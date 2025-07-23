@@ -24,6 +24,7 @@ func (r *GetCityByCepRepositoryImpl) GetCityByCep(cep *cep.Cep) (string, error) 
 	ctx := context.Background()
 	data, err := r.client.Get(ctx, url)
 	if err != nil {
+		println("deu erro no cep")
 		return "", err
 	}
 

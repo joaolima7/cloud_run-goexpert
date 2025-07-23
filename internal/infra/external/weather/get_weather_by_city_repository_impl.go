@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net/url"
 
 	"github.com/joaolima7/cloud_run-goexpert/internal/domain/weather"
 	httpclient "github.com/joaolima7/cloud_run-goexpert/internal/infra/http_client"
@@ -23,8 +24,8 @@ func NewGetWeatherByCityRepositoryImpl(client httpclient.HTTPClient, apiKey stri
 }
 
 func (r *GetWeatherByCityRepositoryImpl) GetWeatherByCity(city string) (*weather.Weather, error) {
-	url := "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" + r.apiKey + "&units=metric"
-	println("Requesting weather data from:", url)
+	escapedCity := url.QueryEscape(city)
+	url := "https://api.openweathermap.org/data/2.5/weather?q=" + escapedCity + "&appid=" + r.apiKey + "&units=metric"
 	ctx := context.Background()
 	data, err := r.client.Get(ctx, url)
 	if err != nil {
