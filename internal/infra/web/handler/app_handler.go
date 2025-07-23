@@ -6,14 +6,19 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/joaolima7/cloud_run-goexpert/internal/domain/cep/usecase"
+	weatherUC "github.com/joaolima7/cloud_run-goexpert/internal/domain/weather/usecase"
 )
 
 type AppHandler struct {
-	useCase *usecase.GetCityByCepUseCase
+	useCaseCep     *usecase.GetCityByCepUseCase
+	useCaseWeather *weatherUC.GetWeatherByCityUseCase
 }
 
-func NewAppHandler(uc *usecase.GetCityByCepUseCase) *AppHandler {
-	return &AppHandler{useCase: uc}
+func NewAppHandler(uc *usecase.GetCityByCepUseCase, weatherUC *weatherUC.GetWeatherByCityUseCase) *AppHandler {
+	return &AppHandler{
+		useCaseCep:     uc,
+		useCaseWeather: weatherUC,
+	}
 }
 
 func (h *AppHandler) RegisterRoutes(r chi.Router) {
@@ -24,12 +29,19 @@ func (h *AppHandler) RegisterRoutes(r chi.Router) {
 
 func (h *AppHandler) getWeatherByCity(w http.ResponseWriter, r *http.Request) {
 	cepParam := chi.URLParam(r, "cep")
-	out, err := h.useCase.Execute(usecase.CepInputDTO{Cep: cepParam})
+	out, err := h.useCaseCep.Execute(usecase.CepInputDTO{Cep: cepParam})
 	if err != nil {
 		h.respondError(w, http.StatusBadRequest, err)
 		return
 	}
-	h.respondJSON(w, http.StatusOK, out)
+
+	outWeather, err := h.useCaseWeather.Execute(weatherUC.WeatherInputDTO{City: out.City})
+	if err != nil {
+		h.respondError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	h.respondJSON(w, http.StatusOK, outWeather)
 }
 
 func (h *AppHandler) respondJSON(w http.ResponseWriter, status int, payload interface{}) {

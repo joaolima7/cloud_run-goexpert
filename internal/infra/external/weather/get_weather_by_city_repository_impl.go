@@ -23,7 +23,8 @@ func NewGetWeatherByCityRepositoryImpl(client httpclient.HTTPClient, apiKey stri
 }
 
 func (r *GetWeatherByCityRepositoryImpl) GetWeatherByCity(city string) (*weather.Weather, error) {
-	url := "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" + r.apiKey
+	url := "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" + r.apiKey + "&units=metric"
+	println("Requesting weather data from:", url)
 	ctx := context.Background()
 	data, err := r.client.Get(ctx, url)
 	if err != nil {

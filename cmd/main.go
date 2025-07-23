@@ -20,9 +20,14 @@ func main() {
 		log.Fatalf("Error initializing GetCityByCepUseCase: %v", err)
 	}
 
+	weatherUC, err := app.InitializeGetWeatherByCityUseCase()
+	if err != nil {
+		log.Fatalf("Error initializing GetWeatherByCityUseCase: %v", err)
+	}
+
 	server := webserver.NewWebServer(":" + cfg.WebServerPort)
 
-	appHandler := handler.NewAppHandler(getCityUC)
+	appHandler := handler.NewAppHandler(getCityUC, weatherUC)
 	appHandler.RegisterRoutes(server.Router)
 
 	log.Printf("Starting server on port %s", cfg.WebServerPort)
