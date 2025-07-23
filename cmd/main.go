@@ -22,8 +22,8 @@ func main() {
 
 	server := webserver.NewWebServer(":" + cfg.WebServerPort)
 
-	cepHandler := handler.NewCepHandler(getCityUC)
-	cepHandler.RegisterRoutes(server.Router)
+	appHandler := handler.NewAppHandler(getCityUC)
+	appHandler.RegisterRoutes(server.Router)
 
 	log.Printf("Starting server on port %s", cfg.WebServerPort)
 	server.Start()

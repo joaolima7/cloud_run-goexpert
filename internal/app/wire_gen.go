@@ -11,7 +11,10 @@ import (
 	"github.com/joaolima7/cloud_run-goexpert/config"
 	"github.com/joaolima7/cloud_run-goexpert/internal/domain/cep/repository"
 	"github.com/joaolima7/cloud_run-goexpert/internal/domain/cep/usecase"
+	repository2 "github.com/joaolima7/cloud_run-goexpert/internal/domain/weather/repository"
+	usecase2 "github.com/joaolima7/cloud_run-goexpert/internal/domain/weather/usecase"
 	"github.com/joaolima7/cloud_run-goexpert/internal/infra/external/cep"
+	"github.com/joaolima7/cloud_run-goexpert/internal/infra/external/weather"
 	"github.com/joaolima7/cloud_run-goexpert/internal/infra/http_client"
 	"time"
 )
@@ -25,22 +28,48 @@ func InitializeGetCityByCepUseCase() (*usecase.GetCityByCepUseCase, error) {
 	return getCityByCepUseCase, nil
 }
 
+func InitializeGetWeatherByCityUseCase() (*usecase2.GetWeatherByCityUseCase, error) {
+	httpClient := provideHTTPClient()
+	config, err := provideConfig()
+	if err != nil {
+		return nil, err
+	}
+	string2 := provideWeatherAPIKey(config)
+	getWeatherByCityRepository := provideWeatherRepository(httpClient, string2)
+	getWeatherByCityUseCase := provideGetWeatherByCityUseCase(getWeatherByCityRepository)
+	return getWeatherByCityUseCase, nil
+}
+
 // wire.go:
 
 func provideConfig() (*config.Config, error) {
 	return config.LoadConfig()
 }
 
+func provideWeatherAPIKey(cfg *config.Config) string {
+	return cfg.WeatherKey
+}
+
 func provideHTTPClient() httpclient.HTTPClient {
 	return httpclient.NewHTTPClientImpl(10 * time.Second)
 }
 
+// --- Repositories ---
 func provideCepRepository(client httpclient.HTTPClient) repository.GetCityByCepRepository {
 	return cep.NewGetCityByCepRepositoryImpl(client)
 }
 
+func provideWeatherRepository(client httpclient.HTTPClient, apiKey string) repository2.GetWeatherByCityRepository {
+	return weather.NewGetWeatherByCityRepositoryImpl(client, apiKey)
+}
+
+// --- Use Cases ---
 func provideGetCityUseCase(repo repository.GetCityByCepRepository) *usecase.GetCityByCepUseCase {
 	return usecase.NewGetCityByCepUseCase(repo)
+}
+
+func provideGetWeatherByCityUseCase(repo repository2.GetWeatherByCityRepository) *usecase2.GetWeatherByCityUseCase {
+	return usecase2.NewGetWeatherByCityUseCase(repo)
 }
 
 var (
@@ -52,8 +81,20 @@ var (
 		provideCepRepository,
 	)
 
+	repoWeatherSet = wire.NewSet(
+		configSet,
+		clientSet,
+		provideWeatherAPIKey,
+		provideWeatherRepository,
+	)
+
 	getCityUseCaseSet = wire.NewSet(
 		repoSet,
 		provideGetCityUseCase,
+	)
+
+	getWeatherUseCaseSet = wire.NewSet(
+		repoWeatherSet,
+		provideGetWeatherByCityUseCase,
 	)
 )
