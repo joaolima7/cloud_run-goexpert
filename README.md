@@ -43,3 +43,9 @@ GET http://localhost:8080/cep/15041785
   "temp_K": 298.15
 }
 ```
+
+## ENDPOINT DE PRODUÇÃO
+
+```
+https://cloud-run-goexpert-aae7wkoyrq-uc.a.run.app/cep/15041785
+```
