@@ -19,8 +19,8 @@ func NewGetCityByCepRepositoryImpl(client httpclient.HTTPClient) *GetCityByCepRe
 	}
 }
 
-func (r *GetCityByCepRepositoryImpl) GetCityByCep(cep *cep.Cep) (string, error) {
-	url := fmt.Sprintf("https://viacep.com.br/ws/%s/json/", cep.CEP)
+func (r *GetCityByCepRepositoryImpl) GetCityByCep(cepInput *cep.Cep) (string, error) {
+	url := fmt.Sprintf("https://viacep.com.br/ws/%s/json/", cepInput.CEP)
 	ctx := context.Background()
 	data, err := r.client.Get(ctx, url)
 	if err != nil {
@@ -37,7 +37,7 @@ func (r *GetCityByCepRepositoryImpl) GetCityByCep(cep *cep.Cep) (string, error) 
 	}
 
 	if cityData.City == "" {
-		return "", fmt.Errorf("city not found for CEP: %s", cep.CEP)
+		return "", cep.ErrCepNotFound
 	}
 
 	return cityData.City, nil

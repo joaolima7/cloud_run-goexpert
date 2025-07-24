@@ -2,7 +2,6 @@ package httpclient
 
 import (
 	"context"
-	"errors"
 	"io"
 	"net/http"
 	"time"
@@ -31,10 +30,6 @@ func (c *HTTPClientImpl) Get(ctx context.Context, url string) ([]byte, error) {
 		return nil, err
 	}
 	defer resp.Body.Close()
-
-	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return nil, errors.New("erro ao fazer o GET: status " + resp.Status)
-	}
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
